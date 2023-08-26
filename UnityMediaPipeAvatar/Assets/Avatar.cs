@@ -24,9 +24,11 @@ public class Avatar : MonoBehaviour
     }
     public void Calibrate()
     {
+        // Here we store the values of variables required to do the correct rotations at runtime.
+
         parentCalibrationData.Clear();
 
-        // A bit of a dirty method, I still need to figure out how to properly handle this.
+        // Manually setting calibration data for the spine chain as we want really specific control over that.
         spineUpDown = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Spine), animator.GetBoneTransform(HumanBodyBones.Neck),
             server.GetVirtualHip(), server.GetVirtualNeck());
         hipsTwist = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Hips), animator.GetBoneTransform(HumanBodyBones.Hips),
@@ -36,6 +38,7 @@ public class Avatar : MonoBehaviour
         head = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Neck), animator.GetBoneTransform(HumanBodyBones.Head),
             server.GetVirtualNeck(), server.GetLandmark(Landmark.NOSE));
 
+        // Adding calibration data automatically for the rest of the bones.
         AddCalibration(HumanBodyBones.RightUpperArm, HumanBodyBones.RightLowerArm,
             server.GetLandmark(Landmark.RIGHT_SHOULDER), server.GetLandmark(Landmark.RIGHT_ELBOW));
         AddCalibration(HumanBodyBones.RightLowerArm, HumanBodyBones.RightHand,
@@ -75,6 +78,7 @@ public class Avatar : MonoBehaviour
 
     private void Update()
     {
+        // Adjust the vertical position of the avatar to keep it approximately grounded.
         if(parentCalibrationData.Count > 0)
         {
             float displacement = 0;
@@ -93,32 +97,26 @@ public class Avatar : MonoBehaviour
                 Time.deltaTime*5f);
         }
 
+        // Compute the new rotations for each limbs of the avatar using the calibration datas we created before.
         foreach(var i in parentCalibrationData)
         {
             Quaternion deltaRotTracked = Quaternion.FromToRotation(i.Value.initialDir, i.Value.CurrentDirection);
-
-            if (i.Key == HumanBodyBones.LeftFoot || i.Key == HumanBodyBones.RightFoot)
-            {
-                Vector3 d = Vector3.Slerp(i.Value.initialDir, i.Value.CurrentDirection, 1f);
-                deltaRotTracked = Quaternion.FromToRotation(i.Value.initialDir,d);
-                i.Value.parent.rotation = deltaRotTracked * i.Value.initialRotation;
-                continue; 
-            }
-
             i.Value.parent.rotation = deltaRotTracked * i.Value.initialRotation;
         }
 
-        // Deal with spine as a special case.
+        // Deal with spine chain as a special case.
         if(parentCalibrationData.Count > 0)
         {
-            Vector3 hd = Vector3.SlerpUnclamped(head.initialDir, head.CurrentDirection, 1);
+            Vector3 hd = head.CurrentDirection;
+            // Some are partial rotations which we can stack together to specify how much we should rotate.
             Quaternion headr = Quaternion.FromToRotation(head.initialDir, hd);
             Quaternion twist = Quaternion.FromToRotation(hipsTwist.initialDir, 
                 Vector3.Slerp(hipsTwist.initialDir,hipsTwist.CurrentDirection,.25f));
             Quaternion updown = Quaternion.FromToRotation(spineUpDown.initialDir,
                 Vector3.Slerp(spineUpDown.initialDir, spineUpDown.CurrentDirection, .25f));
 
-            Quaternion h = updown * updown * updown * twist*twist;
+            // Compute the final rotations.
+            Quaternion h = updown * updown * updown * twist * twist;
             Quaternion s = h * twist * updown;
             Quaternion c = s * twist * twist;
             float speed = 10f;
@@ -127,12 +125,14 @@ public class Avatar : MonoBehaviour
             chest.Tick(c * chest.initialRotation, speed);
             head.Tick(updown * twist * headr * head.initialRotation, speed);
 
+            // For additional responsiveness, we rotate the entire transform slightly based on the hips.
             Vector3 d = Vector3.Slerp(hipsTwist.initialDir, hipsTwist.CurrentDirection, .25f);
             d.y *= 0.5f;
             Quaternion deltaRotTracked = Quaternion.FromToRotation(hipsTwist.initialDir, d);
             targetRot= deltaRotTracked * initialRotation;
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * speed);
 
+            // The tracking of the camera.
             if (cam)
             {
                 Quaternion q = Quaternion.LookRotation((animator.GetBoneTransform(HumanBodyBones.Chest).transform.position - cam.transform.position).normalized, Vector3.up);
@@ -142,6 +142,9 @@ public class Avatar : MonoBehaviour
 
     }
 
+    /// <sumemary>
+    /// Cache various values which will be reused during the runtime.
+    /// </summary>
     class CalibrationData
     {
         public Transform parent, child,tparent,tchild;

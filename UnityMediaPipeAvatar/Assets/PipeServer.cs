@@ -29,6 +29,8 @@ public class PipeServer : MonoBehaviour
 
     private Body body;
 
+    // these virtual transforms are not actually provided by mediapipe pose, but are required for avatars.
+    // so I just manually compute them
     private Transform virtualNeck;
     private Transform virtualHip;
 
