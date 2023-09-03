@@ -49,6 +49,8 @@ public class PipeServer : MonoBehaviour
 
     private void Start()
     {
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
         body = new Body(bodyParent,landmarkPrefab,linePrefab,landmarkScale,enableHead?headPrefab:null);
         virtualNeck = new GameObject("VirtualNeck").transform;
         virtualHip = new GameObject("VirtualHip").transform;
@@ -92,6 +94,8 @@ public class PipeServer : MonoBehaviour
 
     private void Run()
     {
+        System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
         // Open the named pipe.
         server = new NamedPipeServerStream("UnityMediaPipeBody",PipeDirection.InOut, 99, PipeTransmissionMode.Message);
 
@@ -99,7 +103,7 @@ public class PipeServer : MonoBehaviour
         server.WaitForConnection();
 
         print("Connected.");
-        var br = new BinaryReader(server);
+        var br = new BinaryReader(server, Encoding.UTF8);
 
         while (true)
         {
@@ -125,7 +129,8 @@ public class PipeServer : MonoBehaviour
             }
             catch (EndOfStreamException)
             {
-                break;                    // When client disconnects
+                print("Client Disconnected");
+                break;
             }
         }
 
