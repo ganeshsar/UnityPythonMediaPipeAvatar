@@ -20,7 +20,7 @@ By default, this project includes Unity-chan for testing. If you wanted to use o
 2. The resting pose of the avatar should be a T-pose.
 3. Add the Avatar script to the GameObject and correctly assign all the fields.
 
-Video tutorial is coming soon.
+Contact me if you're having trouble with this.
 
 
 ## Current Limitations
