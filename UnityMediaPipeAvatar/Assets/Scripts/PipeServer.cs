@@ -1,3 +1,4 @@
+// REVIEWS
 using System.Collections;
 using System.IO;
 using System.IO.Pipes;
@@ -13,6 +14,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-1)]
 public class PipeServer : MonoBehaviour
 {
+    public bool useLegacyPipes = false; // True to use NamedPipes for interprocess communication (not supported on Linux)
+    public string host = "127.0.0.1"; // This machines host.
+    public int port = 52733; // Must match the Python side.
     public Transform bodyParent;
     public GameObject landmarkPrefab;
     public GameObject linePrefab;
@@ -25,7 +29,9 @@ public class PipeServer : MonoBehaviour
     public int samplesForPose = 1;
     public bool active;
 
-    private NamedPipeServerStream server;
+    private NamedPipeServerStream serverNP;
+    private BinaryReader reader;
+    private ServerUDP server;
 
     private Body body;
 
@@ -57,7 +63,6 @@ public class PipeServer : MonoBehaviour
 
         Thread t = new Thread(new ThreadStart(Run));
         t.Start();
-
     }
     private void Update()
     {
@@ -96,22 +101,44 @@ public class PipeServer : MonoBehaviour
     {
         System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-        // Open the named pipe.
-        server = new NamedPipeServerStream("UnityMediaPipeBody",PipeDirection.InOut, 99, PipeTransmissionMode.Message);
+        if (useLegacyPipes)
+        {
+            // Open the named pipe.
+            serverNP = new NamedPipeServerStream("UnityMediaPipeBody1", PipeDirection.InOut, 99, PipeTransmissionMode.Message);
 
-        print("Waiting for connection...");
-        server.WaitForConnection();
+            print("Waiting for connection...");
+            serverNP.WaitForConnection();
 
-        print("Connected.");
-        var br = new BinaryReader(server, Encoding.UTF8);
+            print("Connected.");
+            reader = new BinaryReader(serverNP, Encoding.UTF8);
+        }
+        else
+        {
+            server = new ServerUDP(host, port);
+            server.Connect();
+            server.StartListeningAsync();
+            print("Listening @"+host+":"+port);
+        }
 
         while (true)
         {
             try
             {
                 Body h = body;
-                var len = (int)br.ReadUInt32();
-                var str = new string(br.ReadChars(len));
+                var len = 0;
+                var str = "";
+
+                if (useLegacyPipes)
+                {
+                    len = (int)reader.ReadUInt32();
+                    str = new string(reader.ReadChars(len));
+                }
+                else
+                {
+                    if(server.HasMessage())
+                        str = server.GetMessage();
+                    len = str.Length;
+                }
 
                 string[] lines = str.Split('\n');
                 foreach (string l in lines)
@@ -139,8 +166,15 @@ public class PipeServer : MonoBehaviour
     private void OnDisable()
     {
         print("Client disconnected.");
-        server.Close();
-        server.Dispose();
+        if (useLegacyPipes)
+        {
+            serverNP.Close();
+            serverNP.Dispose();
+        }
+        else
+        {
+            server.Disconnect();
+        }
     }
 
     const int LANDMARK_COUNT = 33;

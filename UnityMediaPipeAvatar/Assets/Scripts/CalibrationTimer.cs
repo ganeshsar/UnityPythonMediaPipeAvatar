@@ -14,7 +14,24 @@ public class CalibrationTimer : MonoBehaviour
 
     private void Start()
     {
-        text.text = "Press " + calibrationKey + " to start calibration timer.";
+        bool shouldEnable = false;
+        Avatar[] a = FindObjectsByType<Avatar>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        foreach (Avatar aa in a)
+        {
+            if (!aa.isActiveAndEnabled) continue;
+            if (!aa.calibrationData)
+            {
+                shouldEnable = true;
+                break;
+            }
+        }
+        text.text = shouldEnable ? "Press " + calibrationKey + " to start calibration timer." : "";
+
+        gameObject.SetActive(shouldEnable);
+        if (!shouldEnable)
+        {
+            server.SetVisible(false);
+        }
     }
 
     private void Update()
@@ -44,6 +61,7 @@ public class CalibrationTimer : MonoBehaviour
         Avatar[] a = FindObjectsByType<Avatar>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         foreach(Avatar aa in a)
         {
+            if (!aa.isActiveAndEnabled) continue;
             aa.Calibrate();
         }
         if (a.Length>0)

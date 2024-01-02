@@ -4,38 +4,77 @@ using UnityEngine;
 
 public class Avatar : MonoBehaviour
 {
-    public Camera cam;
-    public PipeServer server;
+    public Camera previewCamera; // OPTIONAL
     public Animator animator;
     public LayerMask ground;
     public bool footTracking = true;
     public float footGroundOffset = .1f;
+    [Header("Calibration")]
+    public bool useCalibrationData = false;
+    public PersistentCalibrationData calibrationData;
 
-    private Dictionary<HumanBodyBones, CalibrationData> parentCalibrationData = new Dictionary<HumanBodyBones, CalibrationData>();
+    public bool Calibrated { get; private set; }
+
+    private PipeServer server;
+
     private Quaternion initialRotation;
     private Vector3 initialPosition;
     private Quaternion targetRot;
+
+    private Dictionary<HumanBodyBones, CalibrationData> parentCalibrationData = new Dictionary<HumanBodyBones, CalibrationData>();
     private CalibrationData spineUpDown, hipsTwist,chest,head;
 
     private void Start()
     {
         initialRotation = transform.rotation;
         initialPosition = transform.position;
+
+        if (calibrationData && useCalibrationData)
+        {
+            CalibrateFromPersistent();
+        }
+
+        server = FindObjectOfType<PipeServer>();
+        if (server == null)
+        {
+            Debug.LogError("You must have a PipeServer in the scene!");
+        }
+    }
+
+    public void CalibrateFromPersistent()
+    {
+        parentCalibrationData.Clear();
+
+        if (calibrationData)
+        {
+            foreach (PersistentCalibrationData.CalibrationEntry d in calibrationData.parentCalibrationData)
+            {
+                parentCalibrationData.Add(d.bone, d.data.ReconstructReferences());
+            }
+            spineUpDown = calibrationData.spineUpDown.ReconstructReferences();
+            hipsTwist = calibrationData.hipsTwist.ReconstructReferences();
+            chest = calibrationData.chest.ReconstructReferences();
+            head = calibrationData.head.ReconstructReferences();
+        }
+
+        animator.enabled = false; // disable animator to stop interference.
+        Calibrated = true;
     }
     public void Calibrate()
     {
         // Here we store the values of variables required to do the correct rotations at runtime.
+        print("Calibrating on " + gameObject.name);
 
         parentCalibrationData.Clear();
 
         // Manually setting calibration data for the spine chain as we want really specific control over that.
-        spineUpDown = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Spine), animator.GetBoneTransform(HumanBodyBones.Neck),
+        spineUpDown = new CalibrationData(animator.transform, animator.GetBoneTransform(HumanBodyBones.Spine), animator.GetBoneTransform(HumanBodyBones.Neck),
             server.GetVirtualHip(), server.GetVirtualNeck());
-        hipsTwist = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Hips), animator.GetBoneTransform(HumanBodyBones.Hips),
+        hipsTwist = new CalibrationData(animator.transform, animator.GetBoneTransform(HumanBodyBones.Hips), animator.GetBoneTransform(HumanBodyBones.Hips),
             server.GetLandmark(Landmark.RIGHT_HIP), server.GetLandmark(Landmark.LEFT_HIP));
-        chest = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Chest), animator.GetBoneTransform(HumanBodyBones.Chest),
+        chest = new CalibrationData(animator.transform, animator.GetBoneTransform(HumanBodyBones.Chest), animator.GetBoneTransform(HumanBodyBones.Chest),
             server.GetLandmark(Landmark.RIGHT_HIP), server.GetLandmark(Landmark.LEFT_HIP));
-        head = new CalibrationData(animator.GetBoneTransform(HumanBodyBones.Neck), animator.GetBoneTransform(HumanBodyBones.Head),
+        head = new CalibrationData(animator.transform, animator.GetBoneTransform(HumanBodyBones.Neck), animator.GetBoneTransform(HumanBodyBones.Head),
             server.GetVirtualNeck(), server.GetLandmark(Landmark.NOSE));
 
         // Adding calibration data automatically for the rest of the bones.
@@ -68,12 +107,38 @@ public class Avatar : MonoBehaviour
         }
 
         animator.enabled = false; // disable animator to stop interference.
+        Calibrated = true;
+    }
+
+    public void StoreCalibration()
+    {
+        if (!calibrationData)
+        {
+            Debug.LogError("Optional calibration data must be assigned to store into.");
+            return;
+        }
+
+        List<PersistentCalibrationData.CalibrationEntry> calibrations = new List<PersistentCalibrationData.CalibrationEntry>();
+        foreach (KeyValuePair<HumanBodyBones, CalibrationData> k in parentCalibrationData)
+        {
+            calibrations.Add(new PersistentCalibrationData.CalibrationEntry() { bone = k.Key, data = k.Value });
+        }
+        calibrationData.parentCalibrationData = calibrations.ToArray();
+
+        calibrationData.spineUpDown = spineUpDown;
+        calibrationData.hipsTwist = hipsTwist;
+        calibrationData.chest = chest;
+        calibrationData.head = head;
+
+        calibrationData.Dirty();
+
+        print("Completed storing calibration data "+calibrationData.name);
     }
     private void AddCalibration(HumanBodyBones parent, HumanBodyBones child, Transform trackParent,Transform trackChild)
     {
-        parentCalibrationData.Add(parent, 
-            new CalibrationData(animator.GetBoneTransform(parent), animator.GetBoneTransform(child),
-            trackParent,trackChild));
+        parentCalibrationData.Add(parent,
+            new CalibrationData(animator.transform, animator.GetBoneTransform(parent), animator.GetBoneTransform(child),
+            trackParent, trackChild));
     }
 
     private void Update()
@@ -132,42 +197,8 @@ public class Avatar : MonoBehaviour
             targetRot= deltaRotTracked * initialRotation;
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * speed);
 
-            // The tracking of the camera.
-            if (cam)
-            {
-                Quaternion q = Quaternion.LookRotation((animator.GetBoneTransform(HumanBodyBones.Chest).transform.position - cam.transform.position).normalized, Vector3.up);
-                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, q, Time.deltaTime * 3f);
-            }
         }
 
     }
 
-    /// <sumemary>
-    /// Cache various values which will be reused during the runtime.
-    /// </summary>
-    class CalibrationData
-    {
-        public Transform parent, child,tparent,tchild;
-        public Vector3 initialDir;
-        public Quaternion initialRotation;
-
-        public Quaternion targetRotation;
-        public void Tick(Quaternion newTarget, float speed)
-        {
-            parent.rotation = newTarget;
-            parent.rotation = Quaternion.Lerp(parent.rotation, targetRotation, Time.deltaTime * speed);
-        }
-
-        public Vector3 CurrentDirection => (tchild.position - tparent.position).normalized;
-
-        public CalibrationData(Transform fparent, Transform fchild,Transform tparent,Transform tchild)
-        {
-            initialDir = (tchild.position - tparent.position).normalized;
-            initialRotation = fparent.rotation;
-            this.parent = fparent;
-            this.child = fchild;
-            this.tparent = tparent;
-            this.tchild = tchild;
-        }
-    }
 }

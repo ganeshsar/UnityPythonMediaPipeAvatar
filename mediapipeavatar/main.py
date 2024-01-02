@@ -5,7 +5,6 @@ import struct
 import global_vars
 from sys import exit
 
-
 thread = BodyThread()
 thread.start()
 

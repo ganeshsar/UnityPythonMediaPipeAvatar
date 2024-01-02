@@ -1,0 +1,138 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1260b785da3e24ebe737764cc33de0, type: 3}
+  m_Name: unitychan_dynamic01b94ba1fc691f24296ad189895f32a2
+  m_EditorClassIdentifier: 
+  note: 
+  parentCalibrationData:
+  - bone: 14
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_RightShoulder/Character1_RightArm/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_RightShoulder/Character1_RightArm/Character1_RightForeArm/
+      tparentn: PipeServer/Body Parent/RIGHT_SHOULDER/
+      tchildn: PipeServer/Body Parent/RIGHT_ELBOW/
+      initialDir: {x: -0.9577711, y: -0.28670466, z: 0.021794971}
+      initialRotation: {x: -0.7071085, y: -0.002327919, z: 0.001370728, w: 0.70710003}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 16
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_RightShoulder/Character1_RightArm/Character1_RightForeArm/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_RightShoulder/Character1_RightArm/Character1_RightForeArm/Character1_RightHand/
+      tparentn: PipeServer/Body Parent/RIGHT_ELBOW/
+      tchildn: PipeServer/Body Parent/RIGHT_WRIST/
+      initialDir: {x: -0.9338522, y: -0.3493032, z: 0.07685943}
+      initialRotation: {x: -0.7070138, y: -0.0033798218, z: 0.0018001795, w: 0.7071896}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 2
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/Character1_RightLeg/
+      tparentn: PipeServer/Body Parent/RIGHT_HIP/
+      tchildn: PipeServer/Body Parent/RIGHT_KNEE/
+      initialDir: {x: -0.054078285, y: -0.9973095, z: 0.0494898}
+      initialRotation: {x: 0.5055644, y: 0.49436554, z: -0.5055689, w: -0.4943758}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 4
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/Character1_RightLeg/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/Character1_RightLeg/Character1_RightFoot/
+      tparentn: PipeServer/Body Parent/RIGHT_KNEE/
+      tchildn: PipeServer/Body Parent/RIGHT_ANKLE/
+      initialDir: {x: 0.055027865, y: -0.9392134, z: 0.3388955}
+      initialRotation: {x: 0.51363194, y: 0.4859858, z: -0.5136308, w: -0.48598698}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 13
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_LeftShoulder/Character1_LeftArm/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_LeftShoulder/Character1_LeftArm/Character1_LeftForeArm/
+      tparentn: PipeServer/Body Parent/LEFT_SHOULDER/
+      tchildn: PipeServer/Body Parent/LEFT_ELBOW/
+      initialDir: {x: 0.8273633, y: -0.47728673, z: -0.2960867}
+      initialRotation: {x: 0.0013709068, y: 0.70710003, z: -0.7071085, w: -0.002328217}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 15
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_LeftShoulder/Character1_LeftArm/Character1_LeftForeArm/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_LeftShoulder/Character1_LeftArm/Character1_LeftForeArm/Character1_LeftHand/
+      tparentn: PipeServer/Body Parent/LEFT_ELBOW/
+      tchildn: PipeServer/Body Parent/LEFT_WRIST/
+      initialDir: {x: 0.85583556, y: -0.16076793, z: -0.49162906}
+      initialRotation: {x: 0.0018051267, y: 0.7071854, z: -0.70701814, w: -0.00336653}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 1
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/Character1_LeftLeg/
+      tparentn: PipeServer/Body Parent/LEFT_HIP/
+      tchildn: PipeServer/Body Parent/LEFT_KNEE/
+      initialDir: {x: -0.13167542, y: -0.98945695, z: 0.060303964}
+      initialRotation: {x: 0.51488227, y: 0.48509756, z: -0.49606243, w: -0.5034864}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 3
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/Character1_LeftLeg/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/Character1_LeftLeg/Character1_LeftFoot/
+      tparentn: PipeServer/Body Parent/LEFT_KNEE/
+      tchildn: PipeServer/Body Parent/LEFT_ANKLE/
+      initialDir: {x: 0.09601062, y: -0.94374824, z: 0.31641942}
+      initialRotation: {x: 0.5227934, y: 0.47656387, z: -0.5042748, w: -0.4952585}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 5
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/Character1_LeftLeg/Character1_LeftFoot/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_LeftUpLeg/Character1_LeftLeg/Character1_LeftFoot/Character1_LeftToeBase/
+      tparentn: PipeServer/Body Parent/LEFT_ANKLE/
+      tchildn: PipeServer/Body Parent/LEFT_FOOT_INDEX/
+      initialDir: {x: 0.3152282, y: -0.31472152, z: -0.8953108}
+      initialRotation: {x: 0.37825775, y: 0.59778154, z: -0.3554582, w: -0.6109237}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  - bone: 6
+    data:
+      parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/Character1_RightLeg/Character1_RightFoot/
+      childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_RightUpLeg/Character1_RightLeg/Character1_RightFoot/Character1_RightToeBase/
+      tparentn: PipeServer/Body Parent/RIGHT_ANKLE/
+      tchildn: PipeServer/Body Parent/RIGHT_FOOT_INDEX/
+      initialDir: {x: -0.25290745, y: -0.63896424, z: -0.7264727}
+      initialRotation: {x: 0.3669311, y: 0.6044515, z: -0.36693275, w: -0.6044506}
+      targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  spineUpDown:
+    parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/
+    childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_Neck/
+    tparentn: VirtualHip/
+    tchildn: VirtualNeck/
+    initialDir: {x: -0.051162135, y: 0.93380076, z: -0.35411653}
+    initialRotation: {x: -0.49678373, y: 0.5031958, z: -0.4967838, w: 0.50319576}
+    targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  hipsTwist:
+    parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/
+    childn: unitychan_dynamic/Character1_Reference/Character1_Hips/
+    tparentn: PipeServer/Body Parent/RIGHT_HIP/
+    tchildn: PipeServer/Body Parent/LEFT_HIP/
+    initialDir: {x: 0.957965, y: 0.016949004, z: -0.28638405}
+    initialRotation: {x: -0.4991111, y: 0.50088733, z: -0.50088733, w: 0.4991111}
+    targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  chest:
+    parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/
+    childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/
+    tparentn: PipeServer/Body Parent/RIGHT_HIP/
+    tchildn: PipeServer/Body Parent/LEFT_HIP/
+    initialDir: {x: 0.957965, y: 0.016949004, z: -0.28638405}
+    initialRotation: {x: -0.41962725, y: 0.5751325, z: -0.4107311, w: 0.56959265}
+    targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  head:
+    parentn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_Neck/
+    childn: unitychan_dynamic/Character1_Reference/Character1_Hips/Character1_Spine/Character1_Spine1/Character1_Spine2/Character1_Neck/Character1_Head/
+    tparentn: VirtualNeck/
+    tchildn: PipeServer/Body Parent/NOSE/
+    initialDir: {x: 0.07303416, y: 0.4054966, z: -0.9111742}
+    initialRotation: {x: -0.5111063, y: 0.48864135, z: -0.5111063, w: 0.48864135}
+    targetRotation: {x: 0, y: 0, z: 0, w: 0}

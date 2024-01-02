@@ -2,6 +2,7 @@
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+from clientUDP import ClientUDP
 
 import cv2
 import threading
@@ -49,6 +50,8 @@ class BodyThread(threading.Thread):
     def run(self):
         mp_drawing = mp.solutions.drawing_utils
         mp_pose = mp.solutions.pose
+
+        self.setup_comms()
         
         capture = CaptureThread()
         capture.start()
@@ -89,33 +92,50 @@ class BodyThread(threading.Thread):
                     cv2.imshow('Body Tracking', image)
                     cv2.waitKey(3)
 
-                if self.pipe==None and time.time()-self.timeSinceCheckedConnection>=1:
-                    try:
-                        self.pipe = open(r'\\.\pipe\UnityMediaPipeBody', 'r+b', 0)
-                    except FileNotFoundError:
-                        print("Waiting for Unity project to run...")
-                        self.pipe = None
-                    self.timeSinceCheckedConnection = time.time()
+                # Set up data for relay
+                self.data = ""
+                i = 0
+                if results.pose_world_landmarks:
+                    hand_world_landmarks = results.pose_world_landmarks
+                    for i in range(0,33):
+                        self.data += "{}|{}|{}|{}\n".format(i,hand_world_landmarks.landmark[i].x,hand_world_landmarks.landmark[i].y,hand_world_landmarks.landmark[i].z)
+
+                self.send_data(self.data)
                     
-                if self.pipe != None:
-                    # Set up data for piping
-                    self.data = ""
-                    i = 0
-                    if results.pose_world_landmarks:
-                        hand_world_landmarks = results.pose_world_landmarks
-                        for i in range(0,33):
-                            self.data += "{}|{}|{}|{}\n".format(i,hand_world_landmarks.landmark[i].x,hand_world_landmarks.landmark[i].y,hand_world_landmarks.landmark[i].z)
-                    
-                    s = self.data.encode('utf-8') 
-                    try:     
-                        self.pipe.write(struct.pack('I', len(s)) + s)   
-                        self.pipe.seek(0)    
-                    except Exception as ex:  
-                        print("Failed to write to pipe. Is the unity project open?")
-                        self.pipe= None
-                        
-                #time.sleep(1/20)
-                        
         self.pipe.close()
         capture.cap.release()
         cv2.destroyAllWindows()
+        pass
+
+    def setup_comms(self):
+        if not global_vars.USE_LEGACY_PIPES:
+            self.client = ClientUDP(global_vars.HOST,global_vars.PORT)
+            self.client.start()
+        else:
+            print("Using Pipes for interprocess communication (not supported on OSX or Linux).")
+        pass      
+
+    def send_data(self,message):
+        if not global_vars.USE_LEGACY_PIPES:
+            self.client.sendMessage(message)
+            pass
+        else:
+            # Maintain pipe connection.
+            if self.pipe==None and time.time()-self.timeSinceCheckedConnection>=1:
+                try:
+                    self.pipe = open(r'\\.\pipe\UnityMediaPipeBody1', 'r+b', 0)
+                except FileNotFoundError:
+                    print("Waiting for Unity project to run...")
+                    self.pipe = None
+                self.timeSinceCheckedConnection = time.time()
+
+            if self.pipe != None:
+                try:     
+                    s = self.data.encode('utf-8') 
+                    self.pipe.write(struct.pack('I', len(s)) + s)   
+                    self.pipe.seek(0)    
+                except Exception as ex:  
+                    print("Failed to write to pipe. Is the unity project open?")
+                    self.pipe= None
+        pass
+                        
