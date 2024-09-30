@@ -6,7 +6,7 @@ In order to run the project Python and Unity need to be installed on the device.
 pip install mediapipe
 ```
 
-The project can then be cloned (or downloaded):
+If you don't have git installed, you can install it from [here](https://git-scm.com/downloads). The project can then be cloned (or downloaded):
 ```
 git clone https://github.com/ihendrikson/JIP2024-Mediapipe.git
 ```
